@@ -1,4 +1,4 @@
-﻿exports.newWebSocketsInterface = function newWebSocketsInterface(EVENTS_SERVER) {
+﻿exports.newWebSocketsInterface = function newWebSocketsInterface(EVENT_SERVER) {
 
     const MODULE = "Web Sockets Interface"
     const LOG_INFO = false
@@ -93,7 +93,7 @@
                         }
 
 
-                        EVENTS_SERVER.onMessage(messageToEventServer, onResponse)
+                        EVENT_SERVER.onMessage(messageToEventServer, onResponse)
 
                         function onResponse(message) {
                             socket.send(message)
@@ -103,8 +103,6 @@
                     }
                 }
             }
-
-            console.log('Web Sockets Interface Started.')
         } catch (err) {
             console.log('[ERROR] BackendServers -> Web Sockets Interface -> run -> setUpWebSocketServer -> err.message = ' + err.message.substring(0, 1000))
         }

@@ -42,28 +42,70 @@ global.CUSTOM_FAIL_RESPONSE = {
     message: 'Custom Message'
 }
 
-
-let EVENTS_SERVER = require('./eventsServer.js')
+/* Servers */
+let WEB_SERVER = require('./webServer.js')
+let DATA_FILE_SERVER = require('./dataFileServer.js')
+let PROJECT_FILE_SERVER = require('./projectFileServer.js')
+let WEB_APP_FILE_SERVER = require('./webAppFileServer.js')
+let PLUGIN_SERVER = require('./pluginServer.js')
+let EVENT_SERVER = require('./eventServer.js')
 let TASK_MANAGER_SERVER = require('./taskManagerServer.js')
+let CCXT_SERVER = require('./ccxtServer.js')
+
+/* Network Interfaces */
 let WEB_SOCKETS_INTERFACE = require('./webSocketsServer.js')
 let HTTP_INTERFACE = require('./httpInterface.js')
 
 try {
-    EVENTS_SERVER = EVENTS_SERVER.newEventsServer()
-    EVENTS_SERVER.initialize()
-    EVENTS_SERVER.run()
+    WEB_SERVER = WEB_SERVER.newWebServer()
+    WEB_SERVER.initialize()
+    WEB_SERVER.run()
+    console.log('Web Server ......................... Started')
 
-    TASK_MANAGER_SERVER = TASK_MANAGER_SERVER.newTaskManagerServer(WEB_SOCKETS_INTERFACE, EVENTS_SERVER)
+    DATA_FILE_SERVER = DATA_FILE_SERVER.newDataFileServer()
+    DATA_FILE_SERVER.initialize()
+    DATA_FILE_SERVER.run()
+    console.log('Data File Server ................... Started')
+
+    PROJECT_FILE_SERVER = PROJECT_FILE_SERVER.newProjectFileServer()
+    PROJECT_FILE_SERVER.initialize()
+    PROJECT_FILE_SERVER.run()
+    console.log('Project File Server ................ Started')
+
+    WEB_APP_FILE_SERVER = WEB_APP_FILE_SERVER.newWebAppFileServer()
+    WEB_APP_FILE_SERVER.initialize()
+    WEB_APP_FILE_SERVER.run()
+    console.log('Web App File Server ................ Started')
+
+    PLUGIN_SERVER = PLUGIN_SERVER.newPluginServer()
+    PLUGIN_SERVER.initialize()
+    PLUGIN_SERVER.run()
+    console.log('Plugin Server ...................... Started')
+
+    EVENT_SERVER = EVENT_SERVER.newEventServer()
+    EVENT_SERVER.initialize()
+    EVENT_SERVER.run()
+    console.log('Events Server ...................... Started')
+
+    TASK_MANAGER_SERVER = TASK_MANAGER_SERVER.newTaskManagerServer(WEB_SOCKETS_INTERFACE, EVENT_SERVER)
     TASK_MANAGER_SERVER.initialize()
     TASK_MANAGER_SERVER.run()
+    console.log('Task Manager Server ................ Started')
 
-    WEB_SOCKETS_INTERFACE = WEB_SOCKETS_INTERFACE.newWebSocketsInterface(EVENTS_SERVER)
+    CCXT_SERVER = CCXT_SERVER.newCCXTServer()
+    CCXT_SERVER.initialize()
+    CCXT_SERVER.run()
+    console.log('CCXT Server ........................ Started')
+
+    WEB_SOCKETS_INTERFACE = WEB_SOCKETS_INTERFACE.newWebSocketsInterface(EVENT_SERVER)
     WEB_SOCKETS_INTERFACE.initialize()
     WEB_SOCKETS_INTERFACE.run()
+    console.log('Web Sockets Interface .............. Started')
 
-    HTTP_INTERFACE = HTTP_INTERFACE.newHttpInterface(EVENTS_SERVER)
+    HTTP_INTERFACE = HTTP_INTERFACE.newHttpInterface(WEB_SERVER)
     HTTP_INTERFACE.initialize()
     HTTP_INTERFACE.run()
+    console.log('Http Interface ..................... Started')
 
     //console.log("You are running Superalgos Beta 6 SP4: What's new? Some bugs fixed and improved performance.")
 

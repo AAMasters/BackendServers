@@ -1,4 +1,4 @@
-﻿exports.newTaskManagerServer = function newTaskManagerServer(WEB_SOCKETS_INTERFACE, EVENTS_SERVER) {
+﻿exports.newTaskManagerServer = function newTaskManagerServer(WEB_SOCKETS_INTERFACE, EVENT_SERVER) {
 
     let thisObject = {
         initialize: initialize,
@@ -37,8 +37,6 @@
         eventsServerClient.listenToEvent('Task Manager', 'Run Task', undefined, undefined, undefined, runTask)
         eventsServerClient.listenToEvent('Task Manager', 'Stop Task', undefined, undefined, undefined, stopTask)
         eventsServerClient.listenToEvent('Task Manager', 'Task Status', undefined, undefined, undefined, taskStatus)
-
-        console.log('Task Manager Server Started.')
 
         function runTask(message) {
             //console.log('[INFO] BackendServers -> Task Manager Server -> runTask -> Entering function.') 
@@ -266,7 +264,7 @@
                     responseWaiters.set(command.callerId, responseCallBack)
                 }
 
-                EVENTS_SERVER.onMessage(JSON.stringify(command), thisObject.onMessage)
+                EVENT_SERVER.onMessage(JSON.stringify(command), thisObject.onMessage)
             } catch (err) {
                 console.log('[ERROR] BackendServers -> Task Manager Server -> sendCommand -> Error Sending Command to Events Server -> command = ' + JSON.stringify(command))
                 console.log('[ERROR] BackendServers -> Task Manager Server -> sendCommand -> Error Sending Command to Events Server -> error = ' + err.stack)

@@ -1,4 +1,4 @@
-﻿exports.newEventsServer = function newEventsServer() {
+﻿exports.newEventServer = function newEventServer() {
 
     const MODULE = "Events Server"
     const LOG_INFO = false
@@ -160,7 +160,6 @@
     }
 
     function run() {
-        console.log('Events Server Started.')
     }
 
     function newEventHandler() {

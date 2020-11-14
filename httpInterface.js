@@ -1,4 +1,4 @@
-exports.newHttpInterface = function newHttpInterface(EVENTS_SERVER) {
+exports.newHttpInterface = function newHttpInterface(WEB_SERVER) {
 
     let thisObject = {
         initialize: initialize,
@@ -48,7 +48,6 @@ exports.newHttpInterface = function newHttpInterface(EVENTS_SERVER) {
                     open('http://localhost:' + port)
                 }
 
-                console.log('Http Interface Started.')
             }
         } catch (err) {
             console.log('[ERROR] httpInterface -> startHtttpServer -> Error = ' + err.stack)
@@ -325,42 +324,6 @@ exports.newHttpInterface = function newHttpInterface(EVENTS_SERVER) {
             case 'favicon.ico': // This means the Scripts folder.
                 {
                     respondWithImage(process.env.PATH_TO_WEB_SERVER + 'WebServer/Images/' + 'favicon.ico', response)
-                }
-                break
-
-            case 'CockpitSpace': // This means the CockpitSpace folder.
-                {
-                    respondWithFile(process.env.PATH_TO_CANVAS_APP + '/CockpitSpace/' + requestParameters[2], response)
-                }
-                break
-
-            case 'Plotting': // This means the Plotting folder.
-                {
-                    respondWithFile(process.env.PATH_TO_CANVAS_APP + '/Plotting/' + requestParameters[2], response)
-                }
-                break
-
-            case 'TopSpace': // This means the TopSpace folder.
-                {
-                    respondWithFile(process.env.PATH_TO_CANVAS_APP + '/TopSpace/' + requestParameters[2], response)
-                }
-                break
-
-            case 'DesignSpace': // This means the DesignSpace folder.
-
-                {
-                    if (requestParameters[3] === undefined) {
-                        respondWithFile(process.env.PATH_TO_CANVAS_APP + '/DesignSpace/' + requestParameters[2], response)
-                        return
-                    }
-                    if (requestParameters[4] === undefined) {
-                        respondWithFile(process.env.PATH_TO_CANVAS_APP + '/DesignSpace/' + requestParameters[2] + '/' + requestParameters[3], response)
-                        return
-                    }
-                    if (requestParameters[5] === undefined) {
-                        respondWithFile(process.env.PATH_TO_CANVAS_APP + '/DesignSpace/' + requestParameters[2] + '/' + requestParameters[3] + '/' + requestParameters[4], response)
-                        return
-                    }
                 }
                 break
 
