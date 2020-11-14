@@ -51,6 +51,7 @@ let PLUGIN_SERVER = require('./pluginServer.js')
 let EVENT_SERVER = require('./eventServer.js')
 let TASK_MANAGER_SERVER = require('./taskManagerServer.js')
 let CCXT_SERVER = require('./ccxtServer.js')
+let WEB3_SERVER = require('./web3Server.js')
 
 /* Network Interfaces */
 let WEB_SOCKETS_INTERFACE = require('./webSocketsServer.js')
@@ -96,20 +97,25 @@ try {
     CCXT_SERVER.initialize()
     CCXT_SERVER.run()
     console.log('CCXT Server ........................ Started')
+    
+    WEB3_SERVER = WEB3_SERVER.newWeb3Server()
+    WEB3_SERVER.initialize()
+    WEB3_SERVER.run()
+    console.log('WEB3 Server ........................ Started')
 
     WEB_SOCKETS_INTERFACE = WEB_SOCKETS_INTERFACE.newWebSocketsInterface(EVENT_SERVER)
     WEB_SOCKETS_INTERFACE.initialize()
     WEB_SOCKETS_INTERFACE.run()
     console.log('Web Sockets Interface .............. Started')
 
-    HTTP_INTERFACE = HTTP_INTERFACE.newHttpInterface(WEB_SERVER)
+    HTTP_INTERFACE = HTTP_INTERFACE.newHttpInterface(WEB_SERVER, DATA_FILE_SERVER, PROJECT_FILE_SERVER, WEB_APP_FILE_SERVER, PLUGIN_SERVER, CCXT_SERVER, WEB3_SERVER)
     HTTP_INTERFACE.initialize()
     HTTP_INTERFACE.run()
     console.log('Http Interface ..................... Started')
 
-    //console.log("You are running Superalgos Beta 6 SP4: What's new? Some bugs fixed and improved performance.")
-
-    console.log("You are running Superalgos Beta 7: What's new? Multi-Project & Machine Learning Infrastructure is being implemented here.")
+    console.log('')
+    console.log("You are running Superalgos Beta 7")
+    console.log("What's new? Multi-Project & Machine Learning Infrastructure is being implemented here.")
 
 } catch (err) {
     console.log('[ERROR] BackendServers -> Task Manager -> server -> Error = ' + err.stack)

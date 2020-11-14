@@ -1,4 +1,4 @@
-exports.newHttpInterface = function newHttpInterface(WEB_SERVER) {
+exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVER, PROJECT_FILE_SERVER, WEB_APP_FILE_SERVER, PLUGIN_SERVER, CCXT_SERVER, WEB3_SERVER) {
 
     let thisObject = {
         initialize: initialize,
@@ -327,12 +327,6 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER) {
                 }
                 break
 
-            case 'ControlsToolBox': // This means the DesignSpace folder.
-                {
-                    respondWithFile(process.env.PATH_TO_CANVAS_APP + '/ControlsToolBox/' + requestParameters[2], response)
-                }
-                break
-
             case 'WebServer': // This means the WebServer folder.
                 {
                     respondWithFile(process.env.PATH_TO_WEB_SERVER + 'WebServer/' + requestParameters[2], response)
@@ -366,18 +360,6 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER) {
                 break
 
             case 'ChartLayers':
-                {
-                    respondWithFile(process.env.PATH_TO_CANVAS_APP + '/' + requestParameters[1] + '/' + requestParameters[2], response)
-                }
-                break
-
-            case 'Spaces':
-                {
-                    respondWithFile(process.env.PATH_TO_CANVAS_APP + '/' + requestParameters[1] + '/' + requestParameters[2], response)
-                }
-                break
-
-            case 'Scales':
                 {
                     respondWithFile(process.env.PATH_TO_CANVAS_APP + '/' + requestParameters[1] + '/' + requestParameters[2], response)
                 }
