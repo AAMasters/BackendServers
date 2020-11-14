@@ -1,4 +1,4 @@
-﻿exports.newTaskManagerServer = function newTaskManagerServer(WEB_SOCKETS_SERVER, EVENTS_SERVER) {
+﻿exports.newTaskManagerServer = function newTaskManagerServer(WEB_SOCKETS_INTERFACE, EVENTS_SERVER) {
 
     let thisObject = {
         initialize: initialize,

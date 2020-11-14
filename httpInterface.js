@@ -1,4 +1,4 @@
-exports.newWebServer = function newWebServer(EVENTS_SERVER) {
+exports.newHttpInterface = function newHttpInterface(EVENTS_SERVER) {
 
     let thisObject = {
         initialize: initialize,
@@ -35,7 +35,7 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
     }
 
     function startHtttpServer() {
-        if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> startHtttpServer -> Entering function.') }
+        if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> startHtttpServer -> Entering function.') }
 
         try {
             if (isHttpServerStarted === false) {
@@ -48,15 +48,15 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
                     open('http://localhost:' + port)
                 }
 
-                console.log('Web Server Started.')
+                console.log('Http Interface Started.')
             }
         } catch (err) {
-            console.log('[ERROR] webServer -> startHtttpServer -> Error = ' + err.stack)
+            console.log('[ERROR] httpInterface -> startHtttpServer -> Error = ' + err.stack)
         }
     }
 
     function onBrowserRequest(request, response) {
-        if (CONSOLE_LOG === true && request.url.indexOf('NO-LOG') === -1) { console.log('[INFO] webServer -> onBrowserRequest -> request.url = ' + request.url) }
+        if (CONSOLE_LOG === true && request.url.indexOf('NO-LOG') === -1) { console.log('[INFO] httpInterface -> onBrowserRequest -> request.url = ' + request.url) }
 
         function getBody(callback) { // Gets the de body from a POST request to the web server
             try {
@@ -76,11 +76,11 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
                 })
 
                 request.on('error', function (err) {
-                    if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> onBrowserRequest -> getBody -> err = ' + err.stack) }
+                    if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> onBrowserRequest -> getBody -> err = ' + err.stack) }
                     respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), response)
                 })
             } catch (err) {
-                if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> onBrowserRequest -> getBody -> err = ' + err.stack) }
+                if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> onBrowserRequest -> getBody -> err = ' + err.stack) }
                 respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), response)
             }
         }
@@ -159,7 +159,7 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
                                 err: global.DEFAULT_FAIL_RESPONSE // method not supported
                             }
                         } catch (err) {
-                            if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> CCXT FetchMarkets -> Could not fetch markets.') }
+                            if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> CCXT FetchMarkets -> Could not fetch markets.') }
                             let error = {
                                 result: 'Fail Because',
                                 message: err.message
@@ -180,12 +180,12 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
 
                             /* Some validations */
                             if (exchange === undefined) {
-                                console.log('[WARN] webServer -> Webhook -> Fetch-Messages -> Message with no Exchange received -> messageReceived = ' + messageReceived)
+                                console.log('[WARN] httpInterface -> Webhook -> Fetch-Messages -> Message with no Exchange received -> messageReceived = ' + messageReceived)
                                 respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
                                 return
                             }
                             if (market === undefined) {
-                                console.log('[WARN] webServer -> Webhook -> Fetch-Messages -> Message with no market received -> messageReceived = ' + messageReceived)
+                                console.log('[WARN] httpInterface -> Webhook -> Fetch-Messages -> Message with no market received -> messageReceived = ' + messageReceived)
                                 respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
                                 return
                             }
@@ -214,17 +214,17 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
 
                                 /* Some validations */
                                 if (source === undefined) {
-                                    console.log('[WARN] webServer -> Webhook -> New-Message -> Message with no Source received -> messageReceived = ' + messageReceived)
+                                    console.log('[WARN] httpInterface -> Webhook -> New-Message -> Message with no Source received -> messageReceived = ' + messageReceived)
                                     respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
                                     return
                                 }
                                 if (exchange === undefined) {
-                                    console.log('[WARN] webServer -> Webhook -> New-Message -> Message with no Exchange received -> messageReceived = ' + messageReceived)
+                                    console.log('[WARN] httpInterface -> Webhook -> New-Message -> Message with no Exchange received -> messageReceived = ' + messageReceived)
                                     respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
                                     return
                                 }
                                 if (market === undefined) {
-                                    console.log('[WARN] webServer -> Webhook -> New-Message -> Message with no market received -> messageReceived = ' + messageReceived)
+                                    console.log('[WARN] httpInterface -> Webhook -> New-Message -> Message with no market received -> messageReceived = ' + messageReceived)
                                     respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
                                     return
                                 }
@@ -257,7 +257,7 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
 
                         respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), response)
                     } catch (err) {
-                        if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> ResetLogsAndData -> Could not delete Logs and Data.') }
+                        if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> ResetLogsAndData -> Could not delete Logs and Data.') }
                         let error = {
                             result: 'Fail Because',
                             message: err.message
@@ -487,7 +487,6 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
                     })
                 }
                 break
-
 
             case 'LoadPlugin':
                 {
@@ -859,7 +858,7 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
                         fileContent = fileContent.replace('WEB_SERVER_PORT', process.env.WEB_SERVER_PORT)
                         respondWithContent(fileContent, response, 'text/css')
                     } catch (err) {
-                        console.log('[ERROR] webServer -> mainCSS -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
+                        console.log('[ERROR] httpInterface -> mainCSS -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
                     }
                 }
             } catch (err) {
@@ -881,7 +880,7 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
                             fileContent = fileContent.replace('WEB_SERVER_PORT', process.env.WEB_SERVER_PORT)
                             respondWithContent(fileContent, response)
                         } catch (err) {
-                            console.log('[ERROR] webServer -> homePage -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
+                            console.log('[ERROR] httpInterface -> homePage -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
                         }
                     }
                 } catch (err) {
@@ -894,17 +893,17 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
     }
 
     function respondWithFile(fileName, response) {
-        if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> respondWithFile -> Entering function.') }
+        if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithFile -> Entering function.') }
         let fs = require('fs')
         if (fileName.indexOf('undefined') > 0) {
-            console.log('[WRN] webServer -> respondWithFile -> Received request for undefined file. ')
+            console.log('[WRN] httpInterface -> respondWithFile -> Received request for undefined file. ')
             respondWithContent(undefined, response)
         } else {
             try {
                 fs.readFile(fileName, onFileRead)
 
                 function onFileRead(err, file) {
-                    if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> respondWithFile -> onFileRead -> Entering function.') }
+                    if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithFile -> onFileRead -> Entering function.') }
                     if (!err) {
                         respondWithContent(file.toString(), response)
                     } else {
@@ -919,7 +918,7 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
     }
 
     function respondWithContent(content, response, contentType) {
-        if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> respondWithContent -> Entering function.') }
+        if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithContent -> Entering function.') }
 
         try {
             response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate') // HTTP 1.1.
@@ -945,7 +944,7 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
     }
 
     function respondWithImage(fileName, response) {
-        if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> respondWithImage -> Entering function.') }
+        if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithImage -> Entering function.') }
 
         let fs = require('fs')
         try {
@@ -953,7 +952,7 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
 
             function onFileRead(err, file) {
                 if (err) {
-                    console.log('[ERROR] webServer -> respondWithImage -> onFileRead -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
+                    console.log('[ERROR] httpInterface -> respondWithImage -> onFileRead -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
                     return
                 }
                 try {
@@ -965,27 +964,27 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
                     response.writeHead(200, { 'Content-Type': 'image/png' })
                     response.end(file, 'binary')
                 } catch (err) {
-                    console.log('[ERROR] webServer -> respondWithImage -> onFileRead -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
+                    console.log('[ERROR] httpInterface -> respondWithImage -> onFileRead -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
                 }
             }
         } catch (err) {
-            console.log('[ERROR] webServer -> respondWithImage -> err = ' + err.stack)
+            console.log('[ERROR] httpInterface -> respondWithImage -> err = ' + err.stack)
         }
     }
 
     function respondWithFont(fileName, response) {
-        if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> respondWithBinary -> Entering function.') }
+        if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithBinary -> Entering function.') }
 
         let fs = require('fs')
         try {
             fs.readFile(fileName, onFileRead)
 
             function onFileRead(err, file) {
-                if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> respondWithBinary -> onFileRead -> Entering function.') }
+                if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithBinary -> onFileRead -> Entering function.') }
 
                 try {
                     if (err) {
-                        console.log('[ERROR] webServer -> respondWithBinary -> onFileRead -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
+                        console.log('[ERROR] httpInterface -> respondWithBinary -> onFileRead -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
                         return
                     }
                     response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate') // HTTP 1.1.
@@ -1000,17 +999,17 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
                     }
                     response.end(file, 'binary')
                 } catch (err) {
-                    console.log('[ERROR] webServer -> respondWithBinary -> onFileRead -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
+                    console.log('[ERROR] httpInterface -> respondWithBinary -> onFileRead -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
                 }
             }
         } catch (err) {
-            console.log('[ERROR] webServer -> respondWithBinary -> err = ' + err.stack)
+            console.log('[ERROR] httpInterface -> respondWithBinary -> err = ' + err.stack)
         }
     }
 
     function returnEmptyArray(response) {
         try {
-            if (CONSOLE_LOG === true) { console.log('[INFO] webServer -> returnEmptyArray -> Entering function.') }
+            if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> returnEmptyArray -> Entering function.') }
             response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate') // HTTP 1.1.
             response.setHeader('Pragma', 'no-cache') // HTTP 1.0.
             response.setHeader('Expires', '0') // Proxies.
@@ -1019,7 +1018,7 @@ exports.newWebServer = function newWebServer(EVENTS_SERVER) {
             response.write('[]')
             response.end('\n')
         } catch (err) {
-            console.log('[ERROR] webServer -> returnEmptyArray -> err.stack ' + err.stack)
+            console.log('[ERROR] httpInterface -> returnEmptyArray -> err.stack ' + err.stack)
         }
     }
 

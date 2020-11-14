@@ -1,6 +1,6 @@
-﻿exports.newWebSocketsServer = function newWebSocketsServer(EVENTS_SERVER) {
+﻿exports.newWebSocketsInterface = function newWebSocketsInterface(EVENTS_SERVER) {
 
-    const MODULE = "Web Sockets Server"
+    const MODULE = "Web Sockets Interface"
     const LOG_INFO = false
 
     let thisObject = {
@@ -58,8 +58,8 @@
 
                         if (origin === 'Web Browser') {
                             if (isNaN(nonce) || nonce === "") {
-                                console.log('[ERROR] BackendServers -> Web Sockets Server -> run -> setUpWebSocketServer -> Nonce is not a Number. message = ' + message.substring(0, 1000))
-                                console.log('[ERROR] BackendServers -> Web Sockets Server -> run -> setUpWebSocketServer -> Nonce is not a Number. nonce = ' + nonce)
+                                console.log('[ERROR] BackendServers -> Web Sockets Interface -> run -> setUpWebSocketServer -> Nonce is not a Number. message = ' + message.substring(0, 1000))
+                                console.log('[ERROR] BackendServers -> Web Sockets Interface -> run -> setUpWebSocketServer -> Nonce is not a Number. nonce = ' + nonce)
                                 return
                             }
 
@@ -68,9 +68,9 @@
                             }
 
                             if (Number(nonce) < Number(lastNonce)) {
-                                console.log('[ERROR] BackendServers -> Web Sockets Server -> run -> setUpWebSocketServer -> Nonce received is less than Last Nonce. message = ' + message.substring(0, 1000))
-                                console.log('[ERROR] BackendServers -> Web Sockets Server -> run -> setUpWebSocketServer -> Nonce received is less than Last Nonce. nonce = ' + nonce)
-                                console.log('[ERROR] BackendServers -> Web Sockets Server -> run -> setUpWebSocketServer -> Nonce received is less than Last Nonce. lastNonce = ' + lastNonce)
+                                console.log('[ERROR] BackendServers -> Web Sockets Interface -> run -> setUpWebSocketServer -> Nonce received is less than Last Nonce. message = ' + message.substring(0, 1000))
+                                console.log('[ERROR] BackendServers -> Web Sockets Interface -> run -> setUpWebSocketServer -> Nonce received is less than Last Nonce. nonce = ' + nonce)
+                                console.log('[ERROR] BackendServers -> Web Sockets Interface -> run -> setUpWebSocketServer -> Nonce received is less than Last Nonce. lastNonce = ' + lastNonce)
                                 return
                             }
 
@@ -79,8 +79,8 @@
                             try {
                                 let jsonCheck = JSON.parse(messageToEventServer)
                             } catch (err) {
-                                console.log('[ERROR] BackendServers -> Web Sockets Server -> run -> setUpWebSocketServer -> Message received from the browser is not a valid JSON. message = ' + message.substring(0, 1000))
-                                console.log('[ERROR] BackendServers -> Web Sockets Server -> run -> setUpWebSocketServer -> Message received from the browser is not a valid JSON. messageToEventServer = ' + messageToEventServer)
+                                console.log('[ERROR] BackendServers -> Web Sockets Interface -> run -> setUpWebSocketServer -> Message received from the browser is not a valid JSON. message = ' + message.substring(0, 1000))
+                                console.log('[ERROR] BackendServers -> Web Sockets Interface -> run -> setUpWebSocketServer -> Message received from the browser is not a valid JSON. messageToEventServer = ' + messageToEventServer)
                                 return
                             }
 
@@ -99,14 +99,14 @@
                             socket.send(message)
                         }
                     } catch (err) {
-                        console.log('[ERROR] BackendServers -> Web Sockets Server -> run -> setUpWebSocketServer -> Nonce received is less than Last Nonce. err = ' + err.stack)
+                        console.log('[ERROR] BackendServers -> Web Sockets Interface -> run -> setUpWebSocketServer -> Nonce received is less than Last Nonce. err = ' + err.stack)
                     }
                 }
             }
 
-            console.log('Web Sockets Server Started.')
+            console.log('Web Sockets Interface Started.')
         } catch (err) {
-            console.log('[ERROR] BackendServers -> Web Sockets Server -> run -> setUpWebSocketServer -> err.message = ' + err.message.substring(0, 1000))
+            console.log('[ERROR] BackendServers -> Web Sockets Interface -> run -> setUpWebSocketServer -> err.message = ' + err.message.substring(0, 1000))
         }
     }
 }

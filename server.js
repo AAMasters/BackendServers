@@ -43,27 +43,27 @@ global.CUSTOM_FAIL_RESPONSE = {
 }
 
 
-let EVENTS_SERVER = require('./eventsServer.js');
-let WEB_SOCKETS_SERVER = require('./webSocketsServer.js');
-let TASK_MANAGER_SERVER = require('./taskManagerServer.js');
-let WEB_SERVER = require('./webServer.js');
+let EVENTS_SERVER = require('./eventsServer.js')
+let TASK_MANAGER_SERVER = require('./taskManagerServer.js')
+let WEB_SOCKETS_INTERFACE = require('./webSocketsServer.js')
+let HTTP_INTERFACE = require('./httpInterface.js')
 
 try {
     EVENTS_SERVER = EVENTS_SERVER.newEventsServer()
     EVENTS_SERVER.initialize()
     EVENTS_SERVER.run()
 
-    WEB_SOCKETS_SERVER = WEB_SOCKETS_SERVER.newWebSocketsServer(EVENTS_SERVER)
-    WEB_SOCKETS_SERVER.initialize()
-    WEB_SOCKETS_SERVER.run()
-
-    TASK_MANAGER_SERVER = TASK_MANAGER_SERVER.newTaskManagerServer(WEB_SOCKETS_SERVER, EVENTS_SERVER)
+    TASK_MANAGER_SERVER = TASK_MANAGER_SERVER.newTaskManagerServer(WEB_SOCKETS_INTERFACE, EVENTS_SERVER)
     TASK_MANAGER_SERVER.initialize()
     TASK_MANAGER_SERVER.run()
 
-    WEB_SERVER = WEB_SERVER.newWebServer(EVENTS_SERVER)
-    WEB_SERVER.initialize()
-    WEB_SERVER.run()
+    WEB_SOCKETS_INTERFACE = WEB_SOCKETS_INTERFACE.newWebSocketsInterface(EVENTS_SERVER)
+    WEB_SOCKETS_INTERFACE.initialize()
+    WEB_SOCKETS_INTERFACE.run()
+
+    HTTP_INTERFACE = HTTP_INTERFACE.newHttpInterface(EVENTS_SERVER)
+    HTTP_INTERFACE.initialize()
+    HTTP_INTERFACE.run()
 
     //console.log("You are running Superalgos Beta 6 SP4: What's new? Some bugs fixed and improved performance.")
 
