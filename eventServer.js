@@ -136,14 +136,14 @@
                         /* No matter if it is the listener or the emiter the one that acts first, if an event handler does not exist we just create it acan keep it there. */
 
                     }
-                    //console.log("[INFO] BackendServers -> Events Server -> Raising Event " + command.eventHandlerName + " " + command.eventType)
+                    //console.log("[INFO] Client -> Events Server -> Raising Event " + command.eventHandlerName + " " + command.eventType)
                     eventHandler.raiseEvent(command.eventType, command.event)
                     sendResponse(global.DEFAULT_OK_RESPONSE)
                     return
                 }
             }
 
-            console.log("[WARN] BackendServers -> Events Server -> onMessage -> Unknown Command Received:" + data)
+            console.log("[WARN] Client -> Events Server -> onMessage -> Unknown Command Received:" + data)
 
             function sendResponse(message) {
                 if (command.callerId !== undefined) {
@@ -154,8 +154,8 @@
             }
 
         } catch (err) {
-            console.log("[ERROR] BackendServers -> Events Server -> onMessage -> Bad Command Received:" + data)
-            console.log("[ERROR] BackendServers -> Events Server -> onMessage -> An Error Happened:" + err.stack)
+            console.log("[ERROR] Client -> Events Server -> onMessage -> Bad Command Received:" + data)
+            console.log("[ERROR] Client -> Events Server -> onMessage -> An Error Happened:" + err.stack)
         }
     }
 

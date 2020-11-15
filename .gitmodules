@@ -26,11 +26,11 @@
 	path = Plotters/AAVikings/plotters/Plotters-Linear-Regression-Curve
 	url = https://github.com/AAVikings/Plotters-Linear-Regression-Curve.git
 	branch = master
-[submodule "Files-Component"]
-	path = Files-Component
-	url = https://github.com/Superalgos/Files-Component.git
+[submodule "Data-Files"]
+	path = Data-Files
+	url = https://github.com/Superalgos/Data-Files.git
 	branch = develop
-[submodule "CanvasApp"]
-	path = CanvasApp
-	url = https://github.com/Superalgos/CanvasApp.git
+[submodule "UI"]
+	path = UI
+	url = https://github.com/Superalgos/UI.git
 	branch = develop

@@ -268,19 +268,19 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
 
             case 'LegacyPlotter.js':
                 {
-                    respondWithFile(process.env.PATH_TO_WEB_SERVER + 'WebServer/LegacyPlotter.js', response)
+                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/LegacyPlotter.js', response)
                 }
                 break
 
             case 'PlotterPanel.js':
                 {
-                    respondWithFile(process.env.PATH_TO_WEB_SERVER + 'WebServer/PlotterPanel.js', response)
+                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/PlotterPanel.js', response)
                 }
                 break
 
             case 'Images': // This means the Images folder.
                 {
-                    let path = process.env.PATH_TO_WEB_SERVER + 'WebServer/Images/' + requestParameters[2]
+                    let path = process.env.PATH_TO_CLIENT + 'WebServer/Images/' + requestParameters[2]
 
                     if (requestParameters[3] !== undefined) {
                         path = path + '/' + requestParameters[3]
@@ -323,19 +323,19 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
 
             case 'favicon.ico': // This means the Scripts folder.
                 {
-                    respondWithImage(process.env.PATH_TO_WEB_SERVER + 'WebServer/Images/' + 'favicon.ico', response)
+                    respondWithImage(process.env.PATH_TO_CLIENT + 'WebServer/Images/' + 'favicon.ico', response)
                 }
                 break
 
             case 'WebServer': // This means the WebServer folder.
                 {
-                    respondWithFile(process.env.PATH_TO_WEB_SERVER + 'WebServer/' + requestParameters[2], response)
+                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/' + requestParameters[2], response)
                 }
                 break
 
             case 'externalScripts': // This means the WebServer folder.
                 {
-                    respondWithFile(process.env.PATH_TO_WEB_SERVER + 'WebServer/externalScripts/' + requestParameters[2], response)
+                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/externalScripts/' + requestParameters[2], response)
                 }
                 break
 
@@ -361,13 +361,13 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
 
             case 'ChartLayers':
                 {
-                    respondWithFile(process.env.PATH_TO_CANVAS_APP + '/' + requestParameters[1] + '/' + requestParameters[2], response)
+                    respondWithFile(process.env.PATH_TO_UI + '/' + requestParameters[1] + '/' + requestParameters[2], response)
                 }
                 break
 
             case 'Files':
                 {
-                    respondWithFile(process.env.PATH_TO_FILES_COMPONENT + '/' + requestParameters[2], response)
+                    respondWithFile(process.env.PATH_TO_DATA_FILES + '/' + requestParameters[2], response)
                 }
                 break
 
@@ -791,7 +791,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
         function sendStyleSheet(fileName) {
             let fs = require('fs')
             try {
-                let filePath = process.env.PATH_TO_WEB_SERVER + 'WebServer/' + fileName
+                let filePath = process.env.PATH_TO_CLIENT + 'WebServer/' + fileName
                 fs.readFile(filePath, onFileRead)
 
                 function onFileRead(err, file) {
@@ -815,7 +815,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
             if (requestParameters[1] === '') {
                 let fs = require('fs')
                 try {
-                    let fileName = process.env.PATH_TO_WEB_SERVER + 'WebServer/index.html'
+                    let fileName = process.env.PATH_TO_CLIENT + 'WebServer/index.html'
                     fs.readFile(fileName, onFileRead)
 
                     function onFileRead(err, file) {
@@ -832,7 +832,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                     console.log(err)
                 }
             } else {
-                respondWithFile(process.env.PATH_TO_CANVAS_APP + '/' + requestParameters[1], response)
+                respondWithFile(process.env.PATH_TO_UI + '/' + requestParameters[1], response)
             }
         }
     }
