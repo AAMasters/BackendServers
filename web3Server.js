@@ -53,7 +53,6 @@ exports.newWeb3Server = function newWeb3Server() {
 
                 async function testConnection() {
                     let accounts = await web3.eth.getAccounts()
-                    console.log(accounts)
                     if (web3.currentProvider.connected === false) {
                         return { error: 'Connection to ' + key + ' could not be established.' }
                     } else {
