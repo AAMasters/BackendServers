@@ -54,39 +54,39 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
         }
     }
 
-    function onBrowserRequest(request, response) {
-        if (CONSOLE_LOG === true && request.url.indexOf('NO-LOG') === -1) { console.log('[INFO] httpInterface -> onBrowserRequest -> request.url = ' + request.url) }
+    function onBrowserRequest(httpRequest, httpResponse) {
+        if (CONSOLE_LOG === true && httpRequest.url.indexOf('NO-LOG') === -1) { console.log('[INFO] httpInterface -> onBrowserRequest -> httpRequest.url = ' + httpRequest.url) }
 
-        function getBody(callback) { // Gets the de body from a POST request to the web server
+        function getBody(callback) { // Gets the de body from a POST httpRequest to the web server
             try {
 
                 let body = ''
 
-                request.on('data', function (data) {
+                httpRequest.on('data', function (data) {
                     body += data
                     // Too much POST data
                     //if (body.length > 1e6) {
-                    //    request.connection.destroy()
+                    //    httpRequest.connection.destroy()
                     //}
                 })
 
-                request.on('end', function () {
+                httpRequest.on('end', function () {
                     callback(body)
                 })
 
-                request.on('error', function (err) {
+                httpRequest.on('error', function (err) {
                     if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> onBrowserRequest -> getBody -> err = ' + err.stack) }
-                    respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), response)
+                    respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), httpResponse)
                 })
             } catch (err) {
                 if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> onBrowserRequest -> getBody -> err = ' + err.stack) }
-                respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), response)
+                respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), httpResponse)
             }
         }
 
-        let requestParameters = request.url.split('/')
+        let requestParameters = httpRequest.url.split('/')
 
-        requestParameters = request.url.split('?') // Remove version information
+        requestParameters = httpRequest.url.split('?') // Remove version information
         requestParameters = requestParameters[0].split('/')
 
         switch (requestParameters[1]) {
@@ -102,17 +102,26 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                             switch (params.method) {
                                 case 'getNetworkClientStatus': {
 
-                                    let status = await WEB3_SERVER.getNetworkClientStatus(
+                                    let serverResponse = await WEB3_SERVER.getNetworkClientStatus(
                                         params.host,
                                         params.port,
                                         params.interface
                                     )
 
-                                    respondWithContent(JSON.stringify(status), response)
+                                    respondWithContent(JSON.stringify(serverResponse), httpResponse)
+                                    return
+                                }
+                                case 'createWalletAccount': {
+
+                                    let serverResponse = await WEB3_SERVER.getNetworkClientStatus(
+                                        params.entropy 
+                                    )
+
+                                    respondWithContent(JSON.stringify(serverResponse), httpResponse)
                                     return
                                 }
                                 default: {
-                                    respondWithContent(JSON.stringify({ error: 'Method ' + params.method + ' is invalid.' }), response) 
+                                    respondWithContent(JSON.stringify({ error: 'Method ' + params.method + ' is invalid.' }), httpResponse)
                                 }
                             }
                         } catch (err) {
@@ -125,7 +134,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                 message: err.message,
                                 stack: err.stack
                             }
-                            respondWithContent(JSON.stringify(error), response)
+                            respondWithContent(JSON.stringify(error), httpResponse)
                         }
                     }
                     break
@@ -157,7 +166,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                     if (ccxtExchange.has.fetchMarkets === true) {
                                         ccxtMarkets = await ccxtExchange.fetchMarkets()
                                     }
-                                    respondWithContent(JSON.stringify(ccxtMarkets), response)
+                                    respondWithContent(JSON.stringify(ccxtMarkets), httpResponse)
                                     return
                                 }
                                 case 'listExchanges': {
@@ -189,7 +198,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                             }
                                         }
                                     }
-                                    respondWithContent(JSON.stringify(exchanges), response)
+                                    respondWithContent(JSON.stringify(exchanges), httpResponse)
                                     return
                                 }
                             }
@@ -203,7 +212,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                 result: 'Fail Because',
                                 message: err.message
                             }
-                            respondWithContent(JSON.stringify(error), response)
+                            respondWithContent(JSON.stringify(error), httpResponse)
                         }
                     }
                     break
@@ -220,12 +229,12 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                             /* Some validations */
                             if (exchange === undefined) {
                                 console.log('[WARN] httpInterface -> Webhook -> Fetch-Messages -> Message with no Exchange received -> messageReceived = ' + messageReceived)
-                                respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                                respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                                 return
                             }
                             if (market === undefined) {
                                 console.log('[WARN] httpInterface -> Webhook -> Fetch-Messages -> Message with no market received -> messageReceived = ' + messageReceived)
-                                respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                                respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                                 return
                             }
 
@@ -236,7 +245,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                 webhookMessages = []
                             }
 
-                            respondWithContent(JSON.stringify(webhookMessages), response)
+                            respondWithContent(JSON.stringify(webhookMessages), httpResponse)
                             webhookMessages = []
 
                             webhook.set(key, webhookMessages)
@@ -254,17 +263,17 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                 /* Some validations */
                                 if (source === undefined) {
                                     console.log('[WARN] httpInterface -> Webhook -> New-Message -> Message with no Source received -> messageReceived = ' + messageReceived)
-                                    respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                                    respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                                     return
                                 }
                                 if (exchange === undefined) {
                                     console.log('[WARN] httpInterface -> Webhook -> New-Message -> Message with no Exchange received -> messageReceived = ' + messageReceived)
-                                    respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                                    respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                                     return
                                 }
                                 if (market === undefined) {
                                     console.log('[WARN] httpInterface -> Webhook -> New-Message -> Message with no market received -> messageReceived = ' + messageReceived)
-                                    respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                                    respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                                     return
                                 }
 
@@ -278,7 +287,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                 webhookMessages.push([timestamp, source, messageReceived])
                                 webhook.set(key, webhookMessages)
 
-                                respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), response)
+                                respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), httpResponse)
                             }
                             break
                         }
@@ -294,27 +303,27 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                         rimraf.sync(process.env.STORAGE_PATH + '/Masters/Masters/AAJason.1.0')
                         rimraf.sync(process.env.LOG_PATH)
 
-                        respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), response)
+                        respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), httpResponse)
                     } catch (err) {
                         if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> ResetLogsAndData -> Could not delete Logs and Data.') }
                         let error = {
                             result: 'Fail Because',
                             message: err.message
                         }
-                        respondWithContent(JSON.stringify(error), response)
+                        respondWithContent(JSON.stringify(error), httpResponse)
                     }
                     break
                 }
 
             case 'LegacyPlotter.js':
                 {
-                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/LegacyPlotter.js', response)
+                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/LegacyPlotter.js', httpResponse)
                 }
                 break
 
             case 'PlotterPanel.js':
                 {
-                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/PlotterPanel.js', response)
+                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/PlotterPanel.js', httpResponse)
                 }
                 break
 
@@ -336,7 +345,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
 
                     path = unescape(path)
 
-                    respondWithImage(path, response)
+                    respondWithImage(path, httpResponse)
                 }
                 break
 
@@ -357,25 +366,25 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                     }
 
                     path = unescape(path)
-                    respondWithImage(path, response)
+                    respondWithImage(path, httpResponse)
                 }
                 break
 
             case 'favicon.ico': // This means the Scripts folder.
                 {
-                    respondWithImage(process.env.PATH_TO_CLIENT + 'WebServer/Images/' + 'favicon.ico', response)
+                    respondWithImage(process.env.PATH_TO_CLIENT + 'WebServer/Images/' + 'favicon.ico', httpResponse)
                 }
                 break
 
             case 'WebServer': // This means the WebServer folder.
                 {
-                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/' + requestParameters[2], response)
+                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/' + requestParameters[2], httpResponse)
                 }
                 break
 
             case 'externalScripts': // This means the WebServer folder.
                 {
-                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/externalScripts/' + requestParameters[2], response)
+                    respondWithFile(process.env.PATH_TO_CLIENT + 'WebServer/externalScripts/' + requestParameters[2], httpResponse)
                 }
                 break
 
@@ -385,7 +394,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                     let codeName = requestParameters[3]
                     let moduleName = requestParameters[4]
                     let filePath = process.env.PLOTTERS_PATH + '/' + dataMine + '/plotters/' + codeName + '/' + moduleName
-                    respondWithFile(filePath, response)
+                    respondWithFile(filePath, httpResponse)
                 }
                 break
 
@@ -395,32 +404,32 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                     let codeName = requestParameters[3]
                     let moduleName = requestParameters[4]
                     let filePath = process.env.PLOTTERS_PATH + '/' + dataMine + '/plotters/' + codeName + '/' + moduleName
-                    respondWithFile(filePath, response)
+                    respondWithFile(filePath, httpResponse)
                 }
                 break
 
             case 'ChartLayers':
                 {
-                    respondWithFile(process.env.PATH_TO_UI + '/' + requestParameters[1] + '/' + requestParameters[2], response)
+                    respondWithFile(process.env.PATH_TO_UI + '/' + requestParameters[1] + '/' + requestParameters[2], httpResponse)
                 }
                 break
 
             case 'Files':
                 {
-                    respondWithFile(process.env.PATH_TO_DATA_FILES + '/' + requestParameters[2], response)
+                    respondWithFile(process.env.PATH_TO_DATA_FILES + '/' + requestParameters[2], httpResponse)
                 }
                 break
 
             case 'Fonts':
                 {
-                    respondWithFont(process.env.PATH_TO_FONTS + '/' + requestParameters[2], response)
+                    respondWithFont(process.env.PATH_TO_FONTS + '/' + requestParameters[2], httpResponse)
                 }
                 break
 
             case 'ProjectNames':
                 {
                     let projects = getDirectories(process.env.PROJECTS_PATH)
-                    respondWithContent(JSON.stringify(projects), response)
+                    respondWithContent(JSON.stringify(projects), httpResponse)
                 }
                 break
 
@@ -452,7 +461,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
 
                             projectCounter++
                             if (projectCounter === totalProjects) {
-                                respondWithContent(JSON.stringify(icons), response)
+                                respondWithContent(JSON.stringify(icons), httpResponse)
                             }
                         })
                     }
@@ -468,7 +477,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                     let folder = process.env.PROJECTS_PATH + '/' + project + '/Plugins/' + pluginType
 
                     fs.readdir(folder, (err, files) => {
-                        respondWithContent(JSON.stringify(files), response)
+                        respondWithContent(JSON.stringify(files), httpResponse)
                     })
                 }
                 break
@@ -479,7 +488,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                     let pluginType = unescape(requestParameters[3])
                     let fileName = unescape(requestParameters[4])
                     let filePath = process.env.PROJECTS_PATH + '/' + project + '/Plugins/' + pluginType + '/' + fileName
-                    respondWithFile(filePath, response)
+                    respondWithFile(filePath, httpResponse)
                 }
                 break
 
@@ -496,10 +505,10 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
 
                     function onFileRead(err, workspace) {
                         if (err) {
-                            respondWithContent(undefined, response)
+                            respondWithContent(undefined, httpResponse)
                         } else {
                             let responseContent = 'function getWorkspace(){ return ' + workspace + '}'
-                            respondWithContent(responseContent, response)
+                            respondWithContent(responseContent, httpResponse)
                         }
                     }
                 }
@@ -523,7 +532,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                 function onDirRead(err, fileList) {
                                     if (err) {
                                         if (CONSOLE_ERROR_LOG === true) { console.log('[WARN] Error reading a directory content. filePath = ' + dirPath) }
-                                        respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                                        respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                                         return
                                     } else {
                                         let updatedFileList = []
@@ -542,7 +551,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                             } catch (err) {
                                 if (CONSOLE_ERROR_LOG === true) { console.log('[ERROR] Error reading a directory content. filePath = ' + dirPath) }
                                 if (CONSOLE_ERROR_LOG === true) { console.log('[ERROR] err.stack = ' + err.stack) }
-                                respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                                respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                                 return
                             }
                         }
@@ -557,23 +566,23 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                             function onDirRead(err, fileList) {
                                 if (err) {
                                     if (CONSOLE_ERROR_LOG === true) { console.log('[WARN] Error reading a directory content. filePath = ' + dirPath) }
-                                    respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                                    respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                                     return
                                 } else {
                                     let updatedFileList = []
-                                        for (let i = 0; i < fileList.length; i++) {
-                                            let name = fileList[i]
-                                            updatedFileList.push(['', name])
-                                        }
+                                    for (let i = 0; i < fileList.length; i++) {
+                                        let name = fileList[i]
+                                        updatedFileList.push(['', name])
+                                    }
                                     allWorkspaces = allWorkspaces.concat(updatedFileList)
-                                    respondWithContent(JSON.stringify(allWorkspaces), response)
+                                    respondWithContent(JSON.stringify(allWorkspaces), httpResponse)
                                     return
                                 }
                             }
                         } catch (err) {
                             if (CONSOLE_ERROR_LOG === true) { console.log('[ERROR] Error reading a directory content. filePath = ' + dirPath) }
                             if (CONSOLE_ERROR_LOG === true) { console.log('[ERROR] err.stack = ' + err.stack) }
-                            respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                            respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                             return
                         }
                     }
@@ -584,7 +593,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                 {
                     let fileName = unescape(requestParameters[2])
                     let filePath = process.env.MY_WORKSPACES_PATH + '/' + fileName + '.json'
-                    respondWithFile(filePath, response)
+                    respondWithFile(filePath, httpResponse)
                 }
                 break
 
@@ -612,15 +621,15 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                             function onFileWritten(err) {
                                 if (err) {
                                     if (CONSOLE_ERROR_LOG === true) { console.log('[ERROR] Error writting the Workspace file. fileName = ' + fileName) }
-                                    respondWithContent(JSON.stringify(exchanges), response)
+                                    respondWithContent(JSON.stringify(exchanges), httpResponse)
                                 } else {
-                                    respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), response)
+                                    respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), httpResponse)
                                 }
                             }
 
                         } catch (err) {
                             if (CONSOLE_ERROR_LOG === true) { console.log('[ERROR] Error writting the Workspace file. fileName = ' + fileName) }
-                            respondWithContent(JSON.stringify(exchanges), response)
+                            respondWithContent(JSON.stringify(exchanges), httpResponse)
                         }
                     }
                 }
@@ -635,7 +644,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
             case 'ProjectsSchema':
                 {
                     let path = process.env.PROJECTS_PATH + '/' + 'ProjectsSchema.json'
-                    respondWithFile(path, response)
+                    respondWithFile(path, httpResponse)
                 }
                 break
 
@@ -672,7 +681,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
 
                                 function onDirRead(err, fileList) {
                                     if (err) {
-                                        respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                                        respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                                     } else {
                                         let updatedFileList = []
                                         for (let k = 0; k < fileList.length; k++) {
@@ -683,7 +692,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                         allFiles = allFiles.concat(updatedFileList)
                                         dirCount++
                                         if (dirCount === totalDirs) {
-                                            respondWithContent(JSON.stringify(allFiles), response)
+                                            respondWithContent(JSON.stringify(allFiles), httpResponse)
                                         }
                                     }
                                 }
@@ -692,7 +701,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                 if (CONSOLE_ERROR_LOG === true) { console.log('[ERROR] err.stack = ' + err.stack) }
 
                                 console.log(err.stack)
-                                respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                                respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                                 return
                             }
                         }
@@ -723,13 +732,13 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
 
                     }
                     let filePath = process.env.PROJECTS_PATH + path
-                    respondWithFile(filePath, response)
+                    respondWithFile(filePath, httpResponse)
                 }
                 break
 
             case 'Storage':
                 {
-                    respondWithFile(process.env.STORAGE_PATH + '/' + request.url.substring(9), response)
+                    respondWithFile(process.env.STORAGE_PATH + '/' + httpRequest.url.substring(9), httpResponse)
                 }
                 break
 
@@ -784,7 +793,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                 allLibraries = allLibraries.concat(updatedFileList)
                                 projectsCount++
                                 if (projectsCount === projects.length) {
-                                    respondWithContent(JSON.stringify(allLibraries), response)
+                                    respondWithContent(JSON.stringify(allLibraries), httpResponse)
                                 }
                                 return
                             }
@@ -793,7 +802,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                         if (CONSOLE_ERROR_LOG === true) { console.log('[ERROR] Error reading a directory content. filePath = ' + dirPath) }
                         if (CONSOLE_ERROR_LOG === true) { console.log('[ERROR] err.stack = ' + err.stack) }
 
-                        respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), response)
+                        respondWithContent(JSON.stringify(global.DEFAULT_FAIL_RESPONSE), httpResponse)
                         return
                     }
                 }
@@ -827,9 +836,9 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
 
             function onFileRead(err, schema) {
                 if (err) {
-                    respondWithContent(undefined, response)
+                    respondWithContent(undefined, httpResponse)
                 } else {
-                    respondWithContent(schema, response)
+                    respondWithContent(schema, httpResponse)
                 }
             }
         }
@@ -847,7 +856,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                         fileContent = fileContent.replace('HTTP_INTERFACE_PORT', process.env.HTTP_INTERFACE_PORT)
                         fileContent = fileContent.replace('HTTP_INTERFACE_PORT', process.env.HTTP_INTERFACE_PORT)
                         fileContent = fileContent.replace('HTTP_INTERFACE_PORT', process.env.HTTP_INTERFACE_PORT)
-                        respondWithContent(fileContent, response, 'text/css')
+                        respondWithContent(fileContent, httpResponse, 'text/css')
                     } catch (err) {
                         console.log('[ERROR] httpInterface -> mainCSS -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
                     }
@@ -869,7 +878,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                             let fileContent = file.toString()
 
                             fileContent = fileContent.replace('HTTP_INTERFACE_PORT', process.env.HTTP_INTERFACE_PORT)
-                            respondWithContent(fileContent, response)
+                            respondWithContent(fileContent, httpResponse)
                         } catch (err) {
                             console.log('[ERROR] httpInterface -> homePage -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
                         }
@@ -878,17 +887,17 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                     console.log(err)
                 }
             } else {
-                respondWithFile(process.env.PATH_TO_UI + '/' + requestParameters[1], response)
+                respondWithFile(process.env.PATH_TO_UI + '/' + requestParameters[1], httpResponse)
             }
         }
     }
 
-    function respondWithFile(fileName, response) {
+    function respondWithFile(fileName, httpResponse) {
         if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithFile -> Entering function.') }
         let fs = require('fs')
         if (fileName.indexOf('undefined') > 0) {
-            console.log('[WRN] httpInterface -> respondWithFile -> Received request for undefined file. ')
-            respondWithContent(undefined, response)
+            console.log('[WRN] httpInterface -> respondWithFile -> Received httpRequest for undefined file. ')
+            respondWithContent(undefined, httpResponse)
         } else {
             try {
                 fs.readFile(fileName, onFileRead)
@@ -896,10 +905,10 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                 function onFileRead(err, file) {
                     if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithFile -> onFileRead -> Entering function.') }
                     if (!err) {
-                        respondWithContent(file.toString(), response)
+                        respondWithContent(file.toString(), httpResponse)
                     } else {
                         //console.log('File requested not found: ' + fileName)
-                        respondWithContent(undefined, response)
+                        respondWithContent(undefined, httpResponse)
                     }
                 }
             } catch (err) {
@@ -908,33 +917,33 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
         }
     }
 
-    function respondWithContent(content, response, contentType) {
+    function respondWithContent(content, httpResponse, contentType) {
         if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithContent -> Entering function.') }
 
         try {
-            response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate') // HTTP 1.1.
-            response.setHeader('Pragma', 'no-cache') // HTTP 1.0.
-            response.setHeader('Expires', '0') // Proxies.
-            response.setHeader('Access-Control-Allow-Origin', '*') // Allows to access data from other domains.
+            httpResponse.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate') // HTTP 1.1.
+            httpResponse.setHeader('Pragma', 'no-cache') // HTTP 1.0.
+            httpResponse.setHeader('Expires', '0') // Proxies.
+            httpResponse.setHeader('Access-Control-Allow-Origin', '*') // Allows to access data from other domains.
 
             if (content !== undefined) {
                 if (contentType !== undefined) {
-                    response.writeHead(200, { 'Content-Type': contentType })
+                    httpResponse.writeHead(200, { 'Content-Type': contentType })
                 } else {
-                    response.writeHead(200, { 'Content-Type': 'text/html' })
+                    httpResponse.writeHead(200, { 'Content-Type': 'text/html' })
                 }
-                response.write(content)
+                httpResponse.write(content)
             } else {
-                response.writeHead(404, { 'Content-Type': 'text/html' })
-                response.write('The specified key does not exist.')
+                httpResponse.writeHead(404, { 'Content-Type': 'text/html' })
+                httpResponse.write('The specified key does not exist.')
             }
-            response.end('\n')
+            httpResponse.end('\n')
         } catch (err) {
-            returnEmptyArray(response)
+            returnEmptyArray(httpResponse)
         }
     }
 
-    function respondWithImage(fileName, response) {
+    function respondWithImage(fileName, httpResponse) {
         if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithImage -> Entering function.') }
 
         let fs = require('fs')
@@ -947,13 +956,13 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                     return
                 }
                 try {
-                    response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate') // HTTP 1.1.
-                    response.setHeader('Pragma', 'no-cache') // HTTP 1.0.
-                    response.setHeader('Expires', '0') // Proxies.
-                    response.setHeader('Access-Control-Allow-Origin', '*') // Allows to access data from other domains.
+                    httpResponse.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate') // HTTP 1.1.
+                    httpResponse.setHeader('Pragma', 'no-cache') // HTTP 1.0.
+                    httpResponse.setHeader('Expires', '0') // Proxies.
+                    httpResponse.setHeader('Access-Control-Allow-Origin', '*') // Allows to access data from other domains.
 
-                    response.writeHead(200, { 'Content-Type': 'image/png' })
-                    response.end(file, 'binary')
+                    httpResponse.writeHead(200, { 'Content-Type': 'image/png' })
+                    httpResponse.end(file, 'binary')
                 } catch (err) {
                     console.log('[ERROR] httpInterface -> respondWithImage -> onFileRead -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
                 }
@@ -963,7 +972,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
         }
     }
 
-    function respondWithFont(fileName, response) {
+    function respondWithFont(fileName, httpResponse) {
         if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithBinary -> Entering function.') }
 
         let fs = require('fs')
@@ -978,17 +987,17 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                         console.log('[ERROR] httpInterface -> respondWithBinary -> onFileRead -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
                         return
                     }
-                    response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate') // HTTP 1.1.
-                    response.setHeader('Pragma', 'no-cache') // HTTP 1.0.
-                    response.setHeader('Expires', '0') // Proxies.
-                    response.setHeader('Access-Control-Allow-Origin', '*') // Allows to access data from other domains.
+                    httpResponse.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate') // HTTP 1.1.
+                    httpResponse.setHeader('Pragma', 'no-cache') // HTTP 1.0.
+                    httpResponse.setHeader('Expires', '0') // Proxies.
+                    httpResponse.setHeader('Access-Control-Allow-Origin', '*') // Allows to access data from other domains.
 
                     if (fileName.indexOf('2') < 0) {
-                        response.writeHead(200, { 'Content-Type': 'font/woff' })
+                        httpResponse.writeHead(200, { 'Content-Type': 'font/woff' })
                     } else {
-                        response.writeHead(200, { 'Content-Type': 'font/woff2' })
+                        httpResponse.writeHead(200, { 'Content-Type': 'font/woff2' })
                     }
-                    response.end(file, 'binary')
+                    httpResponse.end(file, 'binary')
                 } catch (err) {
                     console.log('[ERROR] httpInterface -> respondWithBinary -> onFileRead -> File Not Found: ' + fileName + ' or Error = ' + err.stack)
                 }
@@ -998,16 +1007,16 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
         }
     }
 
-    function returnEmptyArray(response) {
+    function returnEmptyArray(httpResponse) {
         try {
             if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> returnEmptyArray -> Entering function.') }
-            response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate') // HTTP 1.1.
-            response.setHeader('Pragma', 'no-cache') // HTTP 1.0.
-            response.setHeader('Expires', '0') // Proxies.
+            httpResponse.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate') // HTTP 1.1.
+            httpResponse.setHeader('Pragma', 'no-cache') // HTTP 1.0.
+            httpResponse.setHeader('Expires', '0') // Proxies.
 
-            response.writeHead(200, { 'Content-Type': 'text/html' })
-            response.write('[]')
-            response.end('\n')
+            httpResponse.writeHead(200, { 'Content-Type': 'text/html' })
+            httpResponse.write('[]')
+            httpResponse.end('\n')
         } catch (err) {
             console.log('[ERROR] httpInterface -> returnEmptyArray -> err.stack ' + err.stack)
         }

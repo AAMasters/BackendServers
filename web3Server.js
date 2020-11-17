@@ -4,6 +4,7 @@ exports.newWeb3Server = function newWeb3Server() {
 
     let thisObject = {
         getNetworkClientStatus: getNetworkClientStatus,
+        createWalletAccount: createWalletAccount,
         initialize: initialize,
         finalize: finalize,
         run: run
@@ -72,8 +73,24 @@ exports.newWeb3Server = function newWeb3Server() {
                 status.result = 'Ok'
                 return status
             }
-        } catch(err) {
+        } catch (err) {
             return { error: 'Could not connect to ' + key }
+        }
+    }
+
+    async function createWalletAccount(entropy) {
+        try {
+
+            let account = Web3.eth.accounts.create()
+
+            return {
+                address: account.address,
+                privateKey: account.privateKey,
+                result: 'Ok'
+            }
+
+        } catch (err) {
+            return { error: 'Could not create the account.' }
         }
     }
 }
