@@ -114,7 +114,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                 case 'createWalletAccount': {
 
                                     let serverResponse = await WEB3_SERVER.getNetworkClientStatus(
-                                        params.entropy 
+                                        params.entropy
                                     )
 
                                     respondWithContent(JSON.stringify(serverResponse), httpResponse)
@@ -620,16 +620,28 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
 
                             function onFileWritten(err) {
                                 if (err) {
-                                    if (CONSOLE_ERROR_LOG === true) { console.log('[ERROR] Error writting the Workspace file. fileName = ' + fileName) }
-                                    respondWithContent(JSON.stringify(exchanges), httpResponse)
+                                    console.log('[ERROR] SaveWorkspace -> onFileWritten -> Error writting the Workspace file. fileName = ' + fileName)
+                                    console.log('[ERROR] SaveWorkspace -> onFileWritten -> err.stack = ' + err.stack)
+                                    let error = {
+                                        result: 'Fail Because',
+                                        message: err.message,
+                                        stack: err.stack
+                                    }
+                                    respondWithContent(JSON.stringify(error), httpResponse)
                                 } else {
                                     respondWithContent(JSON.stringify(global.DEFAULT_OK_RESPONSE), httpResponse)
                                 }
                             }
 
                         } catch (err) {
-                            if (CONSOLE_ERROR_LOG === true) { console.log('[ERROR] Error writting the Workspace file. fileName = ' + fileName) }
-                            respondWithContent(JSON.stringify(exchanges), httpResponse)
+                            console.log('[ERROR] SaveWorkspace -> Error writting the Workspace file. fileName = ' + fileName)
+                            console.log('[ERROR] SaveWorkspace -> err.stack = ' + err.stack)
+                            let error = {
+                                result: 'Fail Because',
+                                message: err.message,
+                                stack: err.stack
+                            }
+                            respondWithContent(JSON.stringify(error), httpResponse)
                         }
                     }
                 }
@@ -893,7 +905,6 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
     }
 
     function respondWithFile(fileName, httpResponse) {
-        if (CONSOLE_LOG === true) { console.log('[INFO] httpInterface -> respondWithFile -> Entering function.') }
         let fs = require('fs')
         if (fileName.indexOf('undefined') > 0) {
             console.log('[WRN] httpInterface -> respondWithFile -> Received httpRequest for undefined file. ')
