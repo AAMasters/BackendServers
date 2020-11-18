@@ -113,7 +113,7 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                 }
                                 case 'createWalletAccount': {
 
-                                    let serverResponse = await WEB3_SERVER.getNetworkClientStatus(
+                                    let serverResponse = await WEB3_SERVER.createWalletAccount(
                                         params.entropy
                                     )
 

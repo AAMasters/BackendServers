@@ -81,7 +81,8 @@ exports.newWeb3Server = function newWeb3Server() {
     async function createWalletAccount(entropy) {
         try {
 
-            let account = Web3.eth.accounts.create()
+            let web3 = new Web3()
+            let account = web3.eth.accounts.create()
 
             return {
                 address: account.address,
@@ -90,7 +91,7 @@ exports.newWeb3Server = function newWeb3Server() {
             }
 
         } catch (err) {
-            return { error: 'Could not create the account.' }
+            return { error: 'Could not create the account. ' + err.message }
         }
     }
 }
