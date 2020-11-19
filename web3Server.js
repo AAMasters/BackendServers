@@ -116,23 +116,22 @@ exports.newWeb3Server = function newWeb3Server() {
                     for (let j = 0; j < walletAccount.tokenBalances.length; j++) {
                         let tokenBalance = walletAccount.tokenBalances[j]
 
-                        if (tokenBalance.referenceParent === undefined) { continue } console.log(1)
-                        if (tokenBalance.referenceParent.parentNode === undefined) { continue }console.log(2)
-                        if (tokenBalance.referenceParent.smartContracts === undefined) { continue }console.log(3)
+                        if (tokenBalance.referenceParent === undefined) { continue }  
+                        if (tokenBalance.referenceParent.parentNode === undefined) { continue } 
+                        if (tokenBalance.referenceParent.smartContracts === undefined) { continue } 
 
                         if (tokenBalance.referenceParent.config.codeName === undefined) {
                             tokenBalance.error = 'Reference Parent without config.codeName defined.'
                             continue
-                        } console.log(4)
+                        }  
 
                         if (tokenBalance.referenceParent.smartContracts.config.address === undefined) {
                             tokenBalance.error = 'Reference Parent Smart Contract without config.address defined.'
                             continue
-                        }console.log(5)
+                        } 
 
                         let tokenContractAddress = tokenBalance.referenceParent.smartContracts.config.address
-                        console.log(tokenContractAddress)
-                        // The minimum ABI to get ERC20 Token balance
+                         // The minimum ABI to get ERC20 Token balance
                         let minABI = [
                             // balanceOf
                             {
@@ -153,8 +152,8 @@ exports.newWeb3Server = function newWeb3Server() {
                         ];
 
                         let contract = new web3.eth.Contract(minABI, tokenContractAddress);
-                        console.log(5)
-                        try {console.log(6)
+                         
+                        try { 
                             tokenBalance.value = await contract.methods.balanceOf(walletAccount.config.address).call()
                         } catch (err) {
                             if (err.message.indexOf('Provided address') >= 0) {
