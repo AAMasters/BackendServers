@@ -115,7 +115,54 @@ exports.newWeb3Server = function newWeb3Server() {
 
                     for (let j = 0; j < walletAccount.tokenBalances.length; j++) {
                         let tokenBalance = walletAccount.tokenBalances[j]
-                        tokenBalance.value = 0
+
+                        if (tokenBalance.referenceParent === undefined) { continue } console.log(1)
+                        if (tokenBalance.referenceParent.parentNode === undefined) { continue }console.log(2)
+                        if (tokenBalance.referenceParent.smartContracts === undefined) { continue }console.log(3)
+
+                        if (tokenBalance.referenceParent.config.codeName === undefined) {
+                            tokenBalance.error = 'Reference Parent without config.codeName defined.'
+                            continue
+                        } console.log(4)
+
+                        if (tokenBalance.referenceParent.smartContracts.config.address === undefined) {
+                            tokenBalance.error = 'Reference Parent Smart Contract without config.address defined.'
+                            continue
+                        }console.log(5)
+
+                        let tokenContractAddress = tokenBalance.referenceParent.smartContracts.config.address
+                        console.log(tokenContractAddress)
+                        // The minimum ABI to get ERC20 Token balance
+                        let minABI = [
+                            // balanceOf
+                            {
+                                "constant": true,
+                                "inputs": [{ "name": "_owner", "type": "address" }],
+                                "name": "balanceOf",
+                                "outputs": [{ "name": "balance", "type": "uint256" }],
+                                "type": "function"
+                            },
+                            // decimals
+                            {
+                                "constant": true,
+                                "inputs": [],
+                                "name": "decimals",
+                                "outputs": [{ "name": "", "type": "uint8" }],
+                                "type": "function"
+                            }
+                        ];
+
+                        let contract = new web3.eth.Contract(minABI, tokenContractAddress);
+                        console.log(5)
+                        try {console.log(6)
+                            tokenBalance.value = await contract.methods.balanceOf(walletAccount.config.address).call()
+                        } catch (err) {
+                            if (err.message.indexOf('Provided address') >= 0) {
+                                walletAccount.error = 'Invalid configured address.'
+                            } else {
+                                walletAccount.error = err.message
+                            }
+                        }
                     }
                 }
 
