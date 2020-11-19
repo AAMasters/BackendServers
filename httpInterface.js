@@ -120,6 +120,18 @@ exports.newHttpInterface = function newHttpInterface(WEB_SERVER, DATA_FILE_SERVE
                                     respondWithContent(JSON.stringify(serverResponse), httpResponse)
                                     return
                                 }
+                                case 'getWalletBalances': {
+
+                                    let serverResponse = await WEB3_SERVER.getWalletBalances(
+                                        params.host,
+                                        params.port,
+                                        params.interface,
+                                        params.walletDefinition
+                                    )
+
+                                    respondWithContent(JSON.stringify(serverResponse), httpResponse)
+                                    return
+                                }
                                 default: {
                                     respondWithContent(JSON.stringify({ error: 'Method ' + params.method + ' is invalid.' }), httpResponse)
                                 }
